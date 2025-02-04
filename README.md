@@ -143,6 +143,17 @@ We back up the `activation_records` from your main OS prior to downgrading your 
 
 ## Troubleshooting
 
+   ### 恢复不成功，设备一直重启不进入系统
+   查看终端的log，看看有没有下载失败的字样，如果出现下载失败，一定要 Control+C 关闭进程，并重新运行脚本。
+   
+   （ Control+C 关闭进程很重要，不要直接关闭窗口，进程可能还在后台运行，我就深受其害😭）
+   
+   查看终端的log，如果出现了备份激活文件或抹除设备的相关字样，恢复不成功的话一定要重新刷机，并激活设备再重新降级。
+   
+   （激活设备很重要，没有激活文件的话降级不一定会成功不说，降级后有可能还会无法激活！）
+   
+   （（应该是，应该是））
+   
    ### Deep sleep, device won't turn on after locking it, have to reboot.
    The issue that causes deep sleep is unfortunately **unfixable**. There is, however, a workaround to this:
 
