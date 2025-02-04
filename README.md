@@ -45,9 +45,11 @@ Other iOS versions not listed in the chart may also work but they might have une
 
 ！！！ 一定要做 ！！！ 真的很重要
 
-1. 安装 Python： 访问 https://www.python.org/downloads/macos/，嗯，我用的是 Python 3.11.11。
+1. 安装 Python： 访问 https://www.python.org/downloads/macos/
+    嗯，我用的是 Python 3.11.11。
 
-2. 安装 Homebrew： 访问 https://brew.sh，安装方法在里面。
+2. 安装 Homebrew： 访问 https://brew.sh
+    安装方法在里面。
 
 3. 安装 openssl@3 ： 打开终端，输入 `brew install openssl@3`。
 
