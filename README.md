@@ -49,13 +49,13 @@ Other iOS versions not listed in the chart may also work but they might have une
 
 2. 安装 Homebrew： 访问 https://brew.sh，安装方法在里面。
 
-3. 安装 openssl@3 ： 打开终端，输入 brew install openssl@3。
+3. 安装 openssl@3 ： 打开终端，输入 `brew install openssl@3`。
 
 4. 设置 openssl@3 的符号文件 ： 打开终端，输入
 
-    ln -s /usr/local/opt/openssl@3/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.3.dylib
+    `ln -s /usr/local/opt/openssl@3/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.3.dylib`
     
-    ln -s /usr/local/opt/openssl@3/lib/libssl.3.dylib /usr/local/lib/libssl.3.dylib
+    `ln -s /usr/local/opt/openssl@3/lib/libssl.3.dylib /usr/local/lib/libssl.3.dylib`
     
 ## How do I use this?
 
@@ -67,7 +67,7 @@ To use this app, you need to downgrade to a supported version, and have a suppor
 
 `xcode-select install` to install `git` on macos
 
-`git clone https://github.com/PlanePlace/Semaphorin-Modified && cd Semaphorin-Modified`
+`git clone https://github.com/PlanePlace/Semaphorin--Modified && cd Semaphorin--Modified`
 
 Connect device in DFU mode
 
