@@ -11,7 +11,7 @@
 
 ## IF YOUR DEVICE SUPPORTS [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), YOU SHOULD REALLY USE THAT OVER THIS.
 
-## 工具修改了IVKey的获取方式 和 Ramdisk的下载版本
+## 工具修改了 IVKey 的获取方式 和 Ramdisk 的下载版本
 
 ## Support
 
