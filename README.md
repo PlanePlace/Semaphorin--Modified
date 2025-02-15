@@ -11,6 +11,10 @@
 
 ## 如果你的设备支持 [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), 那么你应该使用Legacy-iOS-Kit.
 
+## English Version of README.md
+
+https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md
+
 ## 工具修改了 IVKey 的获取方式 和 Ramdisk 的下载版本
 
 ## 脚本来源
