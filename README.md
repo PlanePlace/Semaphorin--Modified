@@ -6,14 +6,18 @@
 </div>
 
 <h4 align="center"> Uses seprmvr64 by mineek<h4>
-<h6 align="center"> Supports* iOS 7.0.6-12.1 as well as A7-A11 devices </h6>
+<h6 align="center"> 支持* iOS 7.0.6-12.1 且为 A7-A11 设备 </h6>
 <h6 align="center"> This is a fork of the tool with some updates </h6>
 
-## IF YOUR DEVICE SUPPORTS [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), YOU SHOULD REALLY USE THAT OVER THIS.
+## 如果你的设备支持 [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), 那么你应该使用Legacy-iOS-Kit.
 
 ## 工具修改了 IVKey 的获取方式 和 Ramdisk 的下载版本
 
-## Support
+## 脚本来源
+
+https://github.com/LukeZGD/Semaphorin 
+
+## 支持部分
 
 有问题可以提在 Issues 里面！！！
 
@@ -23,9 +27,7 @@ Semaphorin这个项目已经废弃掉了，但是大家还是很想用它，因�
 
 各位大佬轻喷，希望 64bit 的降级道路未来能出现更多可能！
 
-It may be better for someone to rewrite the entire thing, and/or just create or use another tool
-
-## Chart of compatibility
+## 兼容性图表
 
 | iOS         | App Store | Cydia       | Tweaks    | Respring| Cellular | Sideloadly | iTunes     |
 |-------------|-----------|-------------|-----------|---------|----------|------------|------------|
@@ -37,55 +39,9 @@ It may be better for someone to rewrite the entire thing, and/or just create or 
 | 11.3        | &#9745;   | &#9745;     | &#9745;   | &#9745; | &#9745;  | &#9744;    | &#9744;    |
 | 12.1        | &#9745;   | &#9745;     | &#9745;   | &#9745; | &#9745;  | &#9744;    | &#9744;    |
 
-Other iOS versions not listed in the chart may also work but they might have unexpected broken features/jailbreak
+其他没有在表格中列出的 iOS 版本可能会成功降级，但是可能存在问题，例如 App 启动崩溃、插件无法生效等。
 
-## 使用脚本之前
-
-！！！ 一定要做 ！！！ 真的很重要
-
-1. 安装 Python： 访问 https://www.python.org/downloads/macos/
-    嗯，我用的是 Python 3.11.11。
-
-2. 安装 Homebrew： 访问 https://brew.sh
-    安装方法在里面。
-
-3. 安装 openssl@3 ： 打开终端，输入 `brew install openssl@3`。
-
-4. 设置 openssl@3 的符号文件 ： 打开终端，输入
-
-    `ln -s /usr/local/opt/openssl@3/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.3.dylib`
-    
-    `ln -s /usr/local/opt/openssl@3/lib/libssl.3.dylib /usr/local/lib/libssl.3.dylib`
-    
-## How do I use this?
-
-This script deletes everything on your phone, including the main OS if you are not downgrading to iOS 10.3 or later. Make sure to backup all of your data before using this script as **anything on the device prior to running this script will be unrecoverable afterwards**. Use this script at your own risk. We are not responsible for any damages caused by you using this script.
-
-This script will automatically set up a dualboot for iOS 10.3 and later.
-
-To use this app, you need to downgrade to a supported version, and have a supported device.
-
-`xcode-select install` to install `git` on macos
-
-`git clone https://github.com/PlanePlace/Semaphorin--Modified && cd Semaphorin--Modified`
-
-Connect device in DFU mode
-
-`sudo ./semaphorin.sh <the version you are downgrading to> --restore`
-
-For example you may write `sudo ./semaphorin.sh 9.3 --restore`
-
-The script has to backup important files from your current iOS version before you can downgrade.
-
-When the script asks `[*] Please enter the iOS version that is currently installed on your device.`, type your current iOS version and then hit the Enter key to continue.
-
-It should then begin the process of downgrading your device. Please follow the on screen instructions. This might take a while. Your device will reboot multiple times.
-
-If you downgraded to iOS 9 or later, please use the jailbreak app on your home screen to begin jailbreaking your device.
-
-For iOS 7 and 8, see below troubleshooting steps for jailbreaking.
-
-## IVKey
+## 脚本修改部分 - IVKey
 
 IVKey问题不会影响到想要降级 iOS 11 及以上版本的用户，因为 iOS 11 及以上版本不需要解密 Root Filesystem 。
 
@@ -107,43 +63,91 @@ IVKey问题不会影响到想要降级 iOS 11 及以上版本的用户，因为 
 
 等到Semaphorin.sh在降级过程中提示你输入IVKey的时候，粘贴进去就可以了😉
 
-## Subsequent runs after downgrade is finished
+## 脚本需求
 
-Connect device in DFU mode
+macOS Catalina 或更新的版本, 或 Linux。
 
-`sudo ./semaphorin.sh <the version you downgraded to previously> --boot`
+使用 AMD CPU 的黑苹果电脑 将 **不会** 正常工作。
 
-For example, if you downgraded to iOS 9.3, you would run `sudo ./semaphorin.sh 9.3 --boot`.
+稳定的互联网连接。
 
-It should just boot to your requested iOS version normally.
+至少20 GB的可用磁盘空间。
 
-## Requirements
+USB-A 转 Lightning 的数据线。
 
-macOS Catalina or later, or Linux. The script only officially supports these versions.
+USB-C 转 Lightning 的数据线将 **不会** 正常工作。
 
-Hackintoshes with AMD CPUs will **NOT** work with this.
+如果您正在使用只有 USB-C 的设备，请使用拓展坞，用 USB-A 转 Lightning 的数据线连接设备。
 
-Stable internet connection. Please don't try using this with dial up...
+在降级前，脚本将会从设备备份 `apticket.der`, `sep-firmware.img4`, `Baseband`, 和 `keybags` ，所以请确保设备已经激活。
 
-At least 20GB of free space on your computer
+## 使用脚本之前
 
-USB Type-A port and Lightning cable. USB Type-C ports will **NOT** work with this script. If you're using a Mac that only has a USB-C port (such as 12" MacBooks, and late Intel MacBook Airs) a dongle/dock with a USB-A port should work just fine with a standard USB-A to Lightning cable.
+！！！ 一定要做 ！！！ 真的很重要
 
-Working iDevice: The script has to backup `apticket.der`, `sep-firmware.img4`, `Baseband`, and `keybags` from your device before you can downgrade to an older iOS version.
+1. 安装 Python： 访问 https://www.python.org/downloads/macos/
+    嗯，我用的是 Python 3.11.11。
 
-## Setup.app bypass
+2. 安装 Homebrew： 访问 https://brew.sh
+    安装方法在里面。
 
-We will not be providing any support for any method of deleting `/Applications/Setup.app` with our script.
+3. 安装 openssl@3 ： 打开终端，输入 `brew install openssl@3`。
 
-This is only to comply with [r/jailbreak](https://www.reddit.com/r/jailbreak/) and [r/LegacyJailbreak](https://www.reddit.com/r/LegacyJailbreak/) rules and guidelines.
+4. 设置 openssl@3 的符号文件 ： 打开终端，输入
 
-The script will downgrade your iOS version and jailbreak the downgraded OS very easily, but will not allow for bypassing **any** sort of Activation Lock.
+    `ln -s /usr/local/opt/openssl@3/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.3.dylib`
+    
+    `ln -s /usr/local/opt/openssl@3/lib/libssl.3.dylib /usr/local/lib/libssl.3.dylib`
+    
+## 我该如何使用它？
 
-We back up the `activation_records` from your main OS prior to downgrading your device, so please make sure your main OS is activated before using this tool.
+Semaphorin 将会删除您手机上的所有数据，包括设备原有的 iOS 系统， 确保您在降级之前已经备份了设备的所有数据。 **任何在使用脚本之前的操作将会在运行该脚本后无法恢复**. 请为自己的操作负责，我们不为由于此脚本造成的任何损失负责。
 
-## Troubleshooting
+为了使用 Semaphorin，你应该选择一个受支持的降级版本，并使用受支持的降级设备.
 
-   ### 恢复不成功，设备一直重启不进入系统
+1. 在 macOS 上，打开终端，输入 `xcode-select install` 来安装 `git` 。
+
+2. 输入 `git clone https://github.com/PlanePlace/Semaphorin--Modified && cd Semaphorin--Modified` 来获取 Semaphorin。
+
+3. 连接处于 DFU 模式的设备。
+
+4. 输入 `sudo ./semaphorin.sh <你要降级的版本> --restore`。
+
+举个例子，如果您要为设备降级 iOS 9.3，请输入 `sudo ./semaphorin.sh 9.3 --restore`。
+
+在 Semaphorin 正式开始降级操作前，脚本将会于当前设备的 iOS 系统备份必要的文件。
+
+当 Semaphorin 提示您 `[*] Please enter the iOS version that is currently installed on your device.`, 输入您设备当前的 iOS 版本并按回车。
+
+Semaphorin 此时应该开始下载必要文件，请跟随屏幕上的指示，这可能需要一些时间，您的设备将会重启多次。
+
+## 越狱
+
+如果您选择降级到 iOS 9 及以后的版本，请点击设备主屏幕上的越狱工具来越狱设备。
+
+对于降级到 iOS 7 和 iOS 8 的设备，请详见疑难解答部分。
+
+## 重启后，再次引导设备
+
+连接处于 DFU 模式的设备
+
+打开终端，输入`sudo ./semaphorin.sh <the version you downgraded to previously> --boot`
+
+举个例子，如果您降级到了 iOS 9.3，您应该输入`sudo ./semaphorin.sh 9.3 --boot`。
+
+设备将会自动启动到您降级的版本。
+
+## 绕过 Setup.app
+
+在 Semaphorin 中，我们不提供任何删除 `/Applications/Setup.app` 的方法。
+
+相关事宜，请查看 [r/jailbreak](https://www.reddit.com/r/jailbreak/) 和 [r/LegacyJailbreak](https://www.reddit.com/r/LegacyJailbreak/) 的规则
+
+Semaphorin 不会绕过任何**种类**的激活锁
+
+## 疑难解答
+
+   ### 恢复不成功，设备一直重启不进入系统。
    查看终端的log，看看有没有下载失败的字样，如果出现下载失败，一定要 Control+C 关闭进程，并重新运行脚本。
    
    （ Control+C 关闭进程很重要，不要直接关闭窗口，进程可能还在后台运行，我就深受其害😭）
@@ -152,33 +156,31 @@ We back up the `activation_records` from your main OS prior to downgrading your 
    
    （激活设备很重要，没有激活文件的话降级不一定会成功不说，降级后有可能还会无法激活！）
    
-   （（应该是，应该是））
-   
-   ### Deep sleep, device won't turn on after locking it, have to reboot.
-   The issue that causes deep sleep is unfortunately **unfixable**. There is, however, a workaround to this:
+   ### 设备锁屏后，将会自动重启，不进入深度睡眠。
+   这个问题很不幸 **无法修复**。但是有一个方法可以来**解决**这个问题：
 
-   Install the tweak "Insomnia" from BigBoss repo or "Fiona" from the repo https://julioverne.github.io
+   于 Bigboss 源中，安装插件 "Insomnia"  或于 https://julioverne.github.io 源中，安装插件 "Fiona" 。
       
-   *Note: This does slightly affect battery life due to the way it works. You probably aren't using this script for battery life though, are you.
+   *备注: 这会影响电池使用时间，设备将在锁屏后保持 Wi-Fi 连接。
 
-   ### Unable to connect to WiFi networks, incorrect password.
-   This is caused by an issue that's *impossible* to fix. You need to connect to an open WiFi network
+   ### 无法连接加密的 Wi-Fi 网络。
+   这个问题很不幸 **无法修复**。 你需要连接到开放网络。
 
-   You can create one using the Internet Sharing feature on macOS or [linux-wifi-hotspot](https://github.com/lakinduakash/linux-wifi-hotspot) on, you guessed it, Linux if you prefer using another computer for this. 
+   你可以在 macOS 上分享网络 或 使用 [linux-wifi-hotspot](https://github.com/lakinduakash/linux-wifi-hotspot)。
 
-   Be careful when doing this since *anyone* can connect to the open network you created. We are not responsible for **any** damages caused by doing this.
+   注意，任何人都可以连接到您创建的开放网络。 我们不为由于此操作造成的任何损失负责。
 
-   ### Jailbreak/tweaks and other apps do not work (iOS 7 and 8)
-   Open Terminal, type `su` -> `alpine` (input is invisible but still being typed) -> `reload`
+   ### 越狱/插件 或其他的 App 不工作 (iOS 7 and 8)
+   打开 Terminal，输入 `su` -> `alpine` (此时无法查看您输入的内容) -> `reload`
 
-   This is to be done every (re)boot
+   每次重启后都要做这样的操作。
 
-   It may fail the first time due to a malloc error, just close out of Terminal and re open the app. Do the same process over again and it should respring the device. All the apps on your device should now be working properly if you follow these steps.
+   第一次操作可能会失败，重新打开 Terminal 并操作。再次操作后设备会注销，进入主桌面后所有的 插件/App 应该正常工作。
 
-   ### Safari does not work (iOS 10)
-   Use the FileManager app on the home screen instead. It is a drop in replacement for Safari, and has a built in download manager also.
+   ### Safari 不工作 (iOS 10)
+  使用主屏幕上的 FileManager. 这是 Safari 的替代品。
 
-## Credits
+## 致谢
 
 - [PsychoTea](https://github.com/PsychoTea/) for [MeridianJB](https://github.com/PsychoTea/MeridianJB/) which we use for iOS 10.3.3 downgrades
 - [coolstar](https://github.com/coolstar) for [Electra](https://www.coolstar.org/electra/) and [Chimera](https://chimera.coolstar.org/) jailbreaks which we use on iOS 11 and 12 downgrades
