@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
    <h1> Semaphorin 
-      <br/> 64-Bit Downgrade, Dualboot & Jailbreak Utility
+      <br/> 64-Bit 降级, 双启动 & 越狱工具
    </h1>
 </div>
 
