@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir -p logs
-set -x
+#set -x
 verbose=1
 
 echo "[*] Command ran:`if [ $EUID = 0 ]; then echo " sudo"; fi` ./semaphorin.sh $@"
@@ -282,77 +282,74 @@ parse_cmdline() {
 }
 get_device_mode() {
     if [ "$os" = "Darwin" ]; then
-        # 取出所有 idProduct 十进制 → 转为 hex
-        apples=$(ioreg -p IOUSB -w0 -l | grep 'idProduct' | grep -Eo '[0-9]{3,5}' | while read id; do printf "%04x\n" "$id"; done)
+        apples="$(system_profiler SPUSBDataType 2> /dev/null | grep -B1 'Vendor ID: 0x05ac' | grep 'Product ID:' | cut -dx -f2 | cut -d' ' -f1 | tail -r)"
     elif [ "$os" = "Linux" ]; then
-        apples="$(lsusb | grep '05ac:' | cut -d: -f2)"
+        apples="$(lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2)"
     fi
-
     local device_count=0
     local usbserials=""
     for apple in $apples; do
         case "$apple" in
             12a8|12aa|12ab)
-                device_mode=normal
-                device_count=$((device_count+1))
-                ;;
+            device_mode=normal
+            device_count=$((device_count+1))
+            ;;
             1281)
-                device_mode=recovery
-                device_count=$((device_count+1))
-                ;;
+            device_mode=recovery
+            device_count=$((device_count+1))
+            ;;
             1227)
-                device_mode=dfu
-                device_count=$((device_count+1))
-                ;;
+            device_mode=dfu
+            device_count=$((device_count+1))
+            ;;
             1222)
-                device_mode=diag
-                device_count=$((device_count+1))
-                ;;
+            device_mode=diag
+            device_count=$((device_count+1))
+            ;;
             1338)
-                device_mode=checkra1n_stage2
-                device_count=$((device_count+1))
-                ;;
+            device_mode=checkra1n_stage2
+            device_count=$((device_count+1))
+            ;;
             4141)
-                device_mode=pongo
-                device_count=$((device_count+1))
-                ;;
+            device_mode=pongo
+            device_count=$((device_count+1))
+            ;;
         esac
     done
-
     if [ "$device_count" = "0" ]; then
         device_mode=none
     elif [ "$device_count" -ge "2" ]; then
         echo "[-] Please attach only one device" > /dev/tty
         kill -30 0
-        exit 1
+        exit 1;
     fi
-
-    # 补充序列号判断
     if [ "$os" = "Linux" ]; then
-        usbserials=$(cat /sys/bus/usb/devices/*/serial 2>/dev/null)
+        usbserials=$(cat /sys/bus/usb/devices/*/serial)
     elif [ "$os" = "Darwin" ]; then
-        usbserials=$(ioreg -p IOUSB -w0 -l | grep -i "Serial Number" | awk -F'"' '{print $4}')
+        usbserials=$(system_profiler SPUSBDataType 2> /dev/null | grep 'Serial Number' | cut -d: -f2- | sed 's/ //')
     fi
-
-    if grep -qE '(ramdisk tool|SSHRD_Script) (Jan|Feb|Mar|...|Dec)' <<< "$usbserials"; then
+    if grep -qE '(ramdisk tool|SSHRD_Script) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [0-9]{1,2} [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}' <<< "$usbserials"; then
         device_mode=ramdisk
     fi
-
     echo "$device_mode"
 }
 _wait_for_dfu() {
     if [ "$os" = "Darwin" ]; then
-        echo -e "[*]$bu 等待连接 DFU 模式的设备 (通过 ioreg 检测)...$ed"
-        while ! (ioreg -p IOUSB -w0 -l | grep -q 'Apple Mobile Device (DFU Mode)'); do
+        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+            echo "[*] Waiting for device in DFU mode"
+        fi
+
+        while ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); do
             sleep 1
         done
-        echo -e "[*]$bu 设备已连接 DFU 模式$ed"
     else
-        echo -e "[*]$bu 等待连接 DFU 模式的设备 (通过 lsusb 检测)...$ed"
-        while ! (lsusb | grep -q '05ac:1227'); do
+        if ! (lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2 | grep 1227 >> /dev/null); then
+            echo "[*] Waiting for device in DFU mode"
+        fi
+
+        while ! (lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2 | grep 1227 >> /dev/null); do
             sleep 1
         done
-        echo -e "[*]$bu 设备已连接 DFU 模式$ed"
     fi
 }
 _download_ramdisk_boot_files() {
@@ -1837,8 +1834,8 @@ if [[ "$*" == *"--fix-auto-boot"* ]]; then
     exit 0
 fi 
 if [ "$os" = "Darwin" ]; then
-    if ! (ioreg -p IOUSB -w0 -l 2> /dev/null | grep -i 'Apple Mobile Device (DFU Mode)' > /dev/null); then
-    "$bin"/dfuhelper.sh
+    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+        "$bin"/dfuhelper.sh
     fi
 else
     if ! (lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2 | grep 1227 >> /dev/null); then
@@ -1948,28 +1945,26 @@ if [[ "$boot" == 1 ]]; then
         echo "[*] We will try to boot iOS $version on your device"
         echo "[*] You can enable auto-boot again at any time by running $0 $version --fix-auto-boot"
         sleep 5
-            if [ "$os" = "Darwin" ]; then
-                # 用 ioreg 判断 DFU 设备是否存在
-                if ! (ioreg -p IOUSB -w0 -l 2>/dev/null | grep -i 'Apple Mobile Device (DFU Mode)' >/dev/null); then
-                    if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
-                        sleep 10
-                        if [ "$(get_device_mode)" = "recovery" ]; then
-                            "$bin"/dfuhelper.sh
-                        else
-                            "$bin"/dfuhelper4.sh
-                            sleep 5
-                            "$bin"/irecovery -c "setenv auto-boot false"
-                            "$bin"/irecovery -c "saveenv"
-                            "$bin"/dfuhelper.sh
-                        fi
-                    elif [[ "$cpid" = 0x801* && "$deviceid" != *"iPad"* ]]; then
-                        "$bin"/dfuhelper2.sh
+        if [ "$os" = "Darwin" ]; then
+            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
+                    sleep 10
+                    if [ "$(get_device_mode)" = "recovery" ]; then
+                        "$bin"/dfuhelper.sh
                     else
-                        "$bin"/dfuhelper3.sh
+                        "$bin"/dfuhelper4.sh
+                        sleep 5
+                        "$bin"/irecovery -c "setenv auto-boot false"
+                        "$bin"/irecovery -c "saveenv"
+                        "$bin"/dfuhelper.sh
                     fi
+                elif [[ "$cpid" = 0x801* && "$deviceid" != *"iPad"* ]]; then
+                    "$bin"/dfuhelper2.sh
+                else
+                    "$bin"/dfuhelper3.sh
                 fi
-            else
-                # 你的其他平台逻辑保持不变
+            fi
+        else
             if ! (lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2 | grep 1227 >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
@@ -1990,7 +1985,7 @@ if [[ "$boot" == 1 ]]; then
             fi
         fi
         _wait_for_dfu
-        fi
+    fi
     _kill_if_running iproxy
     if [ -e "$dir"/$deviceid/$cpid/$version/iBSS.img4 ]; then
         cd "$dir"/$deviceid/$cpid/$version
@@ -2014,7 +2009,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         _download_ramdisk_boot_files $deviceid $replace $rdversion
         sleep 1
         if [ "$os" = "Darwin" ]; then
-            if ! (ioreg -p IOUSB -w0 -l 2>/dev/null | grep -i 'Apple Mobile Device (DFU Mode)' >/dev/null); then
+            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
                     if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2033,7 +2028,6 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 fi
             fi
         else
-            # 你其他平台的代码
             if ! (lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2 | grep 1227 >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
@@ -2115,8 +2109,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         echo "[*] Waiting for device in DFU mode"
         sleep 1
         if [ "$os" = "Darwin" ]; then
-            # 用 ioreg 判断 DFU 设备是否存在
-            if ! (ioreg -p IOUSB -w0 -l 2>/dev/null | grep -i 'Apple Mobile Device (DFU Mode)' >/dev/null); then
+            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
                     if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2354,7 +2347,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 $("$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/sbin/reboot &" 2> /dev/null &)
                 _kill_if_running iproxy
                 if [ "$os" = "Darwin" ]; then
-                    if ! (ioreg -p IOUSB -w0 -l | grep -q 'Apple Mobile Device (DFU Mode)'); then
+                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2642,7 +2635,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                     _kill_if_running iproxy
                     echo "[*] Device should now reboot. Get ready to enter DFU mode..."
                     if [ "$os" = "Darwin" ]; then
-                        if ! (ioreg -p IOUSB -w0 -l | grep -q 'Apple Mobile Device (DFU Mode)'); then
+                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
