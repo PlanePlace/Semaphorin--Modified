@@ -13,6 +13,8 @@
 
 ## This modified Semaphorin has changed the method of obtaining IVKey and the download version of ramdisk.
 
+## Due to so many bugs we encountered recently, I'm planning to write a .md to let u know how to mannuly downgrade ur devices. Please wait!😉
+
 ## Support
 
 If you encounter any problems, please report them on Issues.
