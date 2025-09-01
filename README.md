@@ -17,6 +17,9 @@ https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md
 
 ## 工具修改了 IVKey 的获取方式 和 Ramdisk 的下载版本
 
+## 由于 macOS 更新导致的设备检测问题 和 IVKey 获取问题过于繁琐 还有工具的诸多Bug
+## 我正在尝试制作一份 可以参考 用来手动执行强制降级操作 的文档 请稍等发布😉
+
 ## 脚本来源
 
 https://github.com/LukeZGD/Semaphorin 
