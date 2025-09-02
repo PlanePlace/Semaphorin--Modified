@@ -1,0 +1,23 @@
+pongo
+1. iPhone10,x iPad6,x iPad7,x =1
+if [[ "$deviceid" == "iPhone10"* || "$deviceid" == "iPad6"* || "$deviceid" == "iPad7"* ]]; then
+    pongo=1
+2.         if [[ "$pongo" == 1 ]]; then
+            if [[ -e "$dir"/$deviceid/0.0/apticket.der && -e "$dir"/$deviceid/0.0/sep-firmware.img4 && -e "$dir"/$deviceid/0.0/keybags ]]; then
+                hit2=1
+                pongo=0
+    
+
+
+iOS 9.3 - 10.3.x
+要求force_activation
+if [[ "$version" == "9.3"* || "$version" == "10."* ]]; then
+    if [[ ! "$ramdisk" == 1 ]]; then
+        force_activation=1
+    fi
+fi
+
+
+
+传入参数如下
+_download_ramdisk_boot_files $deviceid $replace ramdisk版本
