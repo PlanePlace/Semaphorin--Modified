@@ -445,6 +445,7 @@ _download_ramdisk_boot_files() {
             ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'$3'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
             "$bin"/pzb -g BuildManifest.plist "$ipswurl"
         fi
+        # 开始解密kernelcache.dec
         if [ ! -e "$dir"/$1/$cpid/ramdisk/$3/kernelcache.dec ]; then
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) "$ipswurl"
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
@@ -475,6 +476,7 @@ _download_ramdisk_boot_files() {
                 "$bin"/img4 -i $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) -o "$dir"/$1/$cpid/ramdisk/$3/kernelcache.dec -D
             fi
         fi
+        # 开始解密 DeviceTree.dec
         if [ ! -e "$dir"/$1/$cpid/ramdisk/$3/DeviceTree.dec ]; then
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/DeviceTree[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1) "$ipswurl"
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
@@ -501,11 +503,13 @@ _download_ramdisk_boot_files() {
                 mv $(awk "/""$replace""/{x=1}x&&/DeviceTree[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]all_flash[/]all_flash.*production[/]//' | sed 's/Firmware[/]all_flash[/]//') "$dir"/$1/$cpid/ramdisk/$3/DeviceTree.dec
             fi
         fi
+        # 开始寻找 RestoreRamDisk.dmg 的 具体代号
         if [ "$os" = "Darwin" ]; then
             fn="$(/usr/bin/plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" xml1 -o - BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | head -1)"
         else
             fn="$("$bin"/PlistBuddy -c "Print BuildIdentities:0:Manifest:RestoreRamDisk:Info:Path" BuildManifest.plist | tr -d '"')"
         fi
+        # 开始解密 RestoreRamDisk.dmg
         if [ ! -e "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg ]; then
             "$bin"/pzb -g "$fn" "$ipswurl"
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
@@ -531,22 +535,29 @@ _download_ramdisk_boot_files() {
                 "$bin"/img4 -i "$fn" -o "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
             fi
         fi
+        # 若 ramdisk 版本为 12.x - 14.x 则开始下载 trustcache.img4
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* && ! "$3" == "10."* && ! "$3" == "11."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/ramdisk/$3/trustcache.img4 ]; then
                 "$bin"/pzb -g Firmware/"$fn".trustcache "$ipswurl"
                  mv "$fn".trustcache "$dir"/$1/$cpid/ramdisk/$3/trustcache.im4p
             fi
         fi
+        # 清理BuildManifest.plist
         rm -rf BuildManifest.plist
+        # 开始向 ramdisk 中注入文件
         if [ "$os" = "Darwin" ]; then
+            # ramdisk 版本 为 7.x - 9.x 的注入方式
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
+                # 7.x - 8.x 的 ramdisk 大小为 60M，9.x 的为 80M
                 if [[ "$3" == "9."* ]]; then
                     hdiutil resize -size 80M "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 else
                     hdiutil resize -size 60M "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 fi
+                # 开始挂载 ramdisk
                 hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 sudo diskutil enableOwnership /tmp/ramdisk
+                # 开始注入文件 解压 SSH 工具
                 gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
@@ -562,9 +573,12 @@ _download_ramdisk_boot_files() {
                 sudo "$bin"/gnutar -xvf "$dir"/jb/gpt.txt.tar -C /tmp/ramdisk
                 # fixup update partition script, i.e. changes all Update partitions to UpdateX partitions
                 sudo "$bin"/gnutar -xvf "$dir"/jb/fixup_update_partition.tar -C /tmp/ramdisk
+                # 取消挂载
                 hdiutil detach /tmp/ramdisk
+                # 开始重新打包 ramdisk
                 "$bin"/img4tool -c "$dir"/$1/$cpid/ramdisk/$3/ramdisk.im4p -t rdsk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 "$bin"/img4tool -c "$dir"/$1/$cpid/ramdisk/$3/ramdisk.img4 -p "$dir"/$1/$cpid/ramdisk/$3/ramdisk.im4p -m IM4M
+                # 开始对 iBSS 和 iBEC 进行补丁处理
                 if [[ ! "$deviceid" == "iPhone6"* && ! "$deviceid" == "iPhone7"* && ! "$deviceid" == "iPad4"* && ! "$deviceid" == "iPad5"* && ! "$deviceid" == "iPod7"* && "$3" == "9."* ]]; then
                     "$bin"/kairos "$dir"/$1/$cpid/ramdisk/$3/iBSS.dec "$dir"/$1/$cpid/ramdisk/$3/iBSS.patched
                     "$bin"/kairos "$dir"/$1/$cpid/ramdisk/$3/iBEC.dec "$dir"/$1/$cpid/ramdisk/$3/iBEC.patched -b "rd=md0 debug=0x2014e amfi=0xff cs_enforcement_disable=1 $boot_args wdt=-1 `if [ "$check" = '0x8960' ] || [ "$check" = '0x7000' ] || [ "$check" = '0x7001' ]; then echo "-restore"; fi`" -n
@@ -575,11 +589,14 @@ _download_ramdisk_boot_files() {
                     "$bin"/ipatcher "$dir"/$1/$cpid/ramdisk/$3/iBSS.dec "$dir"/$1/$cpid/ramdisk/$3/iBSS.patched
                     "$bin"/ipatcher "$dir"/$1/$cpid/ramdisk/$3/iBEC.dec "$dir"/$1/$cpid/ramdisk/$3/iBEC.patched -b "amfi=0xff cs_enforcement_disable=1 $boot_args rd=md0 nand-enable-reformat=1 -progress"
                 fi
+                # 开始重新打包 iBSS 和 iBEC
                 "$bin"/img4 -i "$dir"/$1/$cpid/ramdisk/$3/iBSS.patched -o "$dir"/$1/$cpid/ramdisk/$3/iBSS.img4 -M IM4M -A -T ibss
                 "$bin"/img4 -i "$dir"/$1/$cpid/ramdisk/$3/iBEC.patched -o "$dir"/$1/$cpid/ramdisk/$3/iBEC.img4 -M IM4M -A -T ibec
                 "$bin"/img4 -i "$dir"/$1/$cpid/ramdisk/$3/kernelcache.dec -o "$dir"/$1/$cpid/ramdisk/$3/kernelcache.img4 -M IM4M -T rkrn
                 "$bin"/img4 -i "$dir"/$1/$cpid/ramdisk/$3/devicetree.dec -o "$dir"/$1/$cpid/ramdisk/$3/devicetree.img4 -A -M IM4M -T rdtr
             else
+                # ramdisk 版本 为 10.x - 17.x 的注入方式
+                # 10.x - 15.x 的 ramdisk 大小为 120M，16.x - 17.x 的为 210M
                 if [[ "$3" == *"16"* || "$3" == *"17"* ]]; then
                     hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                     hdiutil create -size 210m -imagekey diskimage-class=CRawDiskImage -format UDZO -fs HFS+ -layout NONE -srcfolder /tmp/ramdisk -copyuid root "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk1.dmg
@@ -589,6 +606,7 @@ _download_ramdisk_boot_files() {
                     hdiutil resize -size 120M "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                     hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 fi
+                # 开始注入 SSH 工具
                 sudo diskutil enableOwnership /tmp/ramdisk
                 gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
