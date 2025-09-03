@@ -1603,6 +1603,7 @@ _download_clean_boot_files() {
     rm -rf work
 }
 _download_root_fs() {
+    # 获取 IPSW 地址
     ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'$3'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
     buildid="$3"
     #if [[ "$3" == "9.3" ]]; then
@@ -1614,7 +1615,9 @@ _download_root_fs() {
     rm -rf "$dir"/work
     mkdir "$dir"/work
     cd "$dir"/work
+    # 制作IM4M 文件
     "$bin"/img4tool -e -s "$dir"/other/shsh/"${check}".shsh -m IM4M
+    # APFS 文件系统的处理方式
     if [[ "$3" == "10.3"* || "$3" == "11."* || "$3" == "12."* || "$3" == "13."* || "$3" == "14."* ]]; then
         if [ ! -e "$dir"/$1/$cpid/$3/OS.dmg ]; then
             local fn
@@ -1638,6 +1641,7 @@ _download_root_fs() {
             fi
         fi
     else
+    # HFS+ 文件系统的处理方式
         if [ ! -e "$dir"/$1/$cpid/$3/rw.dmg ]; then
             local fn
             if [ ! -e "$dir"/$1/$cpid/$3/OS.dmg ]; then
