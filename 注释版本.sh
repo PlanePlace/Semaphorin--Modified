@@ -780,23 +780,33 @@ _download_boot_files() {
     rm -rf "$dir"/work
     mkdir "$dir"/work
     cd "$dir"/work
+    # 生成 IM4M 文件
     "$bin"/img4tool -e -s "$dir"/other/shsh/"${check}".shsh -m IM4M
+    # 获取相关文件,指定IPSW URL
     if [ ! -e "$dir"/$1/$cpid/$3/kernelcache ]; then
+        # iOS 10.x 下载指定版本 
         if [[ "$3" == "10."* ]]; then
+            # 6s 系列 特殊处理 下载11.1 
             if [[ "$deviceid" == "iPhone8,1" || "$deviceid" == "iPhone8,2" ]]; then
                 ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'11.1'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
+            # 其他系列 正常下载 10.3.3
             else
                 ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'10.3.3'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
             fi
         fi
+        # iOS 9.x 下载降级目标版本 
         if [[ "$3" == "9."* ]]; then
             ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'$meowing'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
         fi
+        # 根据 ipswurl 下载 BuildManifest.plist
         "$bin"/pzb -g BuildManifest.plist "$ipswurl"
+        # iBSS 获取
         if [ ! -e "$dir"/$1/$cpid/$3/iBSS.dec ]; then
+            # iBSS 下载链接获取
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/iBSS[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1) "$ipswurl"
             fn="$(awk "/""$replace""/{x=1}x&&/iBSS[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]dfu[/]//')"
             if [[ "$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -e $buildid $1)" == "true" ]]; then
+            # 根据上文,按需解密
                 if [[ "$3" == "10."* ]]; then
                     if [[ "$deviceid" == "iPhone8,1" || "$deviceid" == "iPhone8,2" ]]; then
                         ivkey="$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -ivkey $fn 11.1 $1)"
@@ -825,10 +835,13 @@ _download_boot_files() {
                 "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/iBSS.dec -k $ivkey
             fi
         fi
+        # iBEC 获取
         if [ ! -e "$dir"/$1/$cpid/$3/iBEC.dec ]; then
+            # iBEC 下载链接获取
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/iBEC[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1) "$ipswurl"
             fn="$(awk "/""$replace""/{x=1}x&&/iBEC[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]dfu[/]//')"
             if [[ "$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -e $buildid $1)" == "true" ]]; then
+            # 根据上文,按需解密
                 if [[ "$3" == "10."* ]]; then
                     if [[ "$deviceid" == "iPhone8,1" || "$deviceid" == "iPhone8,2" ]]; then
                         ivkey="$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -ivkey $fn 11.1 $1)"
@@ -857,17 +870,21 @@ _download_boot_files() {
                 "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/iBEC.dec -k $ivkey
             fi
         fi
+        # 目标降级版本若为 10.x 9.x 则于此时更改URL 继续下载目标版本的其余文件
         if [[ "$3" == "10."* || "$3" == "9."* ]]; then
             rm -rf BuildManifest.plist
             ipswurl=$(curl -k -sL "https://api.ipsw.me/v4/device/$deviceid?type=ipsw" | "$bin"/jq '.firmwares | .[] | select(.version=="'$3'")' | "$bin"/jq -s '.[0] | .url' --raw-output)
             "$bin"/pzb -g BuildManifest.plist "$ipswurl"
         fi
+        # 获取 kernelcache 下载地址 开始处理kernelcache
         if [ ! -e "$dir"/$1/$cpid/$3/kernelcache.dec ]; then
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) "$ipswurl"
+            # iOS 7.x 8.x 9.x 的解密
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
                 fn="$(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1)"
                 if [[ "$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -e $buildid $1)" == "true" ]]; then
                     ivkey="$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -ivkey $fn $buildid $1)"
+                    # IVKey 为空的方法
                     if [ -z $ivkey ]; then
                         kbag=$("$bin"/img4 -i $fn -b | head -n 1)
                         iv=$("$bin"/gaster decrypt_kbag $kbag | tail -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2)
@@ -876,6 +893,7 @@ _download_boot_files() {
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/kcache.raw -k $ivkey
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/kernelcache.dec -k $ivkey -D
                         pyimg4 im4p extract -i $fn -o "$dir"/$1/$cpid/$3/kcache.raw.pyimg4 --iv $iv --key $key --extra "$dir"/$1/$cpid/$3/kpp.bin
+                    #不为空的方法 生成kcache.raw kernelcache.dec kcache.raw.pyimg4  
                     else
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/kcache.raw -k $ivkey
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/kernelcache.dec -k $ivkey -D
@@ -892,14 +910,17 @@ _download_boot_files() {
                     "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/kernelcache.dec -k $ivkey -D
                     pyimg4 im4p extract -i $fn -o "$dir"/$1/$cpid/$3/kcache.raw.pyimg4 --iv $iv --key $key --extra "$dir"/$1/$cpid/$3/kpp.bin
                 fi
+            # iOS 10.x 11.x 12.x 13.x 14.x 的处理
             else
                 "$bin"/img4 -i $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) -o "$dir"/$1/$cpid/$3/kcache.raw
                 "$bin"/img4 -i $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) -o "$dir"/$1/$cpid/$3/kernelcache.dec -D
                 pyimg4 im4p extract -i $(awk "/""$replace""/{x=1}x&&/kernelcache.release/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1) -o "$dir"/$1/$cpid/$3/kcache.raw.pyimg4 --iv $iv --key $key --extra "$dir"/$1/$cpid/$3/kpp.bin
             fi
         fi
+        # 获取 DeviceTree 下载地址 开始处理DeviceTree
         if [ ! -e "$dir"/$1/$cpid/$3/DeviceTree.dec ]; then
             "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/DeviceTree[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1) "$ipswurl"
+            # iOS 7.x 8.x 9.x 的解密
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
                 fn="$(awk "/""$replace""/{x=1}x&&/DeviceTree[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]all_flash[/]all_flash.*production[/]//' | sed 's/Firmware[/]all_flash[/]//')"
                 if [[ "$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -e $buildid $1)" == "true" ]]; then
@@ -910,6 +931,7 @@ _download_boot_files() {
                         key=$("$bin"/gaster decrypt_kbag $kbag | tail -n 1 | cut -d ' ' -f 4)
                         ivkey="$iv$key"
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/DeviceTree.dec -k $ivkey
+                    # 重点在这
                     else
                         "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/DeviceTree.dec -k $ivkey
                     fi
@@ -920,10 +942,12 @@ _download_boot_files() {
                     ivkey="$iv$key"
                     "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/DeviceTree.dec -k $ivkey
                 fi
+            # iOS 10.x - 14.x 的处理
             else
                 mv $(awk "/""$replace""/{x=1}x&&/DeviceTree[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]all_flash[/]all_flash.*production[/]//' | sed 's/Firmware[/]all_flash[/]//') "$dir"/$1/$cpid/$3/DeviceTree.dec
             fi
         fi
+        # iOS 10.x - 14.x 对于aopfw.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/aopfw.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/aopfw/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -936,6 +960,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # iOS 10.x - 14.x 对于homerfw.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/homerfw.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/homer/{print;exit}" BuildManifest.plist | grep '<string>' | cut -d\> -f2 | cut -d\< -f1)  "$ipswurl"
@@ -948,6 +973,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # iOS 10.x - 14.x 对于avefw.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/avefw.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/ave/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -960,6 +986,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # iOS 10.x - 14.x 对于multitouch.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/multitouch.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/[_]Multitouch/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -972,6 +999,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # iOS 10.x - 14.x 对于audiocodefirmware.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/audiocodecfirmware.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/[A]udioDSP/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -984,6 +1012,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # 重复(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/audiocodecfirmware.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/[_]Callan/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -996,6 +1025,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # iOS 10.x - 14.x 对于ispfw.dec的处理(废逻辑)
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/ispfw.dec ]; then
                 "$bin"/pzb -g $(awk "/""$replace""/{x=1}x&&/isp_bni/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)  "$ipswurl"
@@ -1008,6 +1038,7 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # RestoreRamdisk 环节
         if [ "$os" = "Darwin" ]; then
             fn="$(/usr/bin/plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" xml1 -o - BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | head -1)"
         else
@@ -1015,6 +1046,7 @@ _download_boot_files() {
         fi
         if [ ! -e "$dir"/$1/$cpid/$3/RestoreRamDisk.dmg ]; then
             "$bin"/pzb -g "$fn" "$ipswurl"
+            # iOS 7.x 8.x 9.x 的解密
             if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* ]]; then
                 if [[ "$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -e $buildid $1)" == "true" ]]; then
                     ivkey="$(../java/bin/java -jar ../Darwin/FirmwareKeysDl-1.0-SNAPSHOT.jar -ivkey $fn $buildid $1)"
@@ -1034,10 +1066,12 @@ _download_boot_files() {
                     ivkey="$iv$key"
                     "$bin"/img4 -i $fn -o "$dir"/$1/$cpid/$3/RestoreRamDisk.dmg -k $ivkey
                 fi
+            # iOS 10.x - 14.x 的处理
             else
                 "$bin"/img4 -i "$fn" -o "$dir"/$1/$cpid/$3/RestoreRamDisk.dmg
             fi
         fi
+        # iOS 12+ 开始处理 Trustcache.img4
         if [[ ! "$3" == "7."* && ! "$3" == "8."* && ! "$3" == "9."* && ! "$3" == "10."* && ! "$3" == "11."* ]]; then
             if [ ! -e "$dir"/$1/$cpid/$3/trustcache.img4 ]; then
                 local fn
@@ -1051,10 +1085,14 @@ _download_boot_files() {
             fi
         fi
         rm -rf BuildManifest.plist
+        # 开始patch iBSS 等文件
+        # 现有版本为 iOS 16+ 的处理方式
         if [[ "$r" == "16"* || "$r" == "17"* ]]; then
+            # 降级 iOS 9 的处理方式
             if [[ "$3" == "9."* ]]; then
                 "$bin"/kairos "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                 "$bin"/kairos "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s1 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e PE_i_can_has_debugger=1 amfi_get_out_of_my_way=1 amfi_allow_any_signature=1" -n
+            # 降级 其他版本的处理方式
             else
                 "$bin"/iBoot64Patcher "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                 if [[ "$3" == "10.3"* || "$3" == "11."* || "$3" == "12."* ||  "$3" == "13."* || "$3" == "14."* ]]; then
@@ -1063,7 +1101,9 @@ _download_boot_files() {
                     "$bin"/iBoot64Patcher "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s9 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e PE_i_can_has_debugger=1 amfi_get_out_of_my_way=1 amfi_allow_any_signature=1" -n
                 fi
             fi
+        # 现有版本 为 iOS15.x及以下 的处理方式
         else
+            # 若双启动 的处理方式
             if [[ "$dualboot_hfs" == 1 ]]; then
                 if [[ "$3" == "7."* ]]; then
                     "$bin"/ipatcher "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
@@ -1075,16 +1115,21 @@ _download_boot_files() {
                     "$bin"/kairos "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                     "$bin"/kairos "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s3 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e PE_i_can_has_debugger=1 amfi_get_out_of_my_way=1 amfi_allow_any_signature=1" -n
                 fi
+            # 正常降级的 处理方式
             else
+                # iOS 7.x
                 if [[ "$3" == "7."* ]]; then
                     "$bin"/ipatcher "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                     "$bin"/ipatcher "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s1 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e wdt=-1 PE_i_can_has_debugger=1 amfi_get_out_of_my_way=0x1 amfi_unrestrict_task_for_pid=0x0"
+                # iOS 8.x
                 elif [[ "$3" == "8."* ]]; then
                     "$bin"/ipatcher "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                     "$bin"/ipatcher "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s1 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e PE_i_can_has_debugger=1"
+                # iOS 9.x
                 elif [[ "$3" == "9."* ]]; then
                     "$bin"/kairos "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                     "$bin"/kairos "$dir"/$1/$cpid/$3/iBEC.dec "$dir"/$1/$cpid/$3/iBEC.patched -b "$boot_args rd=disk0s1s1 amfi=0xff cs_enforcement_disable=1 keepsyms=1 debug=0x2014e PE_i_can_has_debugger=1 amfi_get_out_of_my_way=1 amfi_allow_any_signature=1" -n
+                # iOS 10+
                 else
                     "$bin"/iBoot64Patcher "$dir"/$1/$cpid/$3/iBSS.dec "$dir"/$1/$cpid/$3/iBSS.patched
                     if [[ "$3" == "10.3"* || "$3" == "11."* || "$3" == "12."* ||  "$3" == "13."* || "$3" == "14."* ]]; then
@@ -1095,6 +1140,8 @@ _download_boot_files() {
                 fi
             fi
         fi
+        # patch完毕 开始转换 iBSS 等文件
+        # iOS 8 的处理方式
         if [[ "$3" == "8."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1104,6 +1151,7 @@ _download_boot_files() {
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/kernelcache.dec -o "$dir"/$1/$cpid/$3/kernelcache -M IM4M -T krnl -P "$dir"/$1/$cpid/$3/kc.bpatch
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/DeviceTree.dec "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 9 的处理方式
         elif [[ "$3" == "9."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1113,6 +1161,7 @@ _download_boot_files() {
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/kernelcache.dec -o "$dir"/$1/$cpid/$3/kernelcache -M IM4M -T krnl -P "$dir"/$1/$cpid/$3/kc.bpatch
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/DeviceTree.dec "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 7 的处理方式
         elif [[ "$3" == "7."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1122,6 +1171,7 @@ _download_boot_files() {
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/kernelcache.dec -o "$dir"/$1/$cpid/$3/kernelcache -M IM4M -T krnl -P "$dir"/$1/$cpid/$3/kc.bpatch
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/DeviceTree.dec "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 10.0.x - 10.2.x 的处理方式
         elif [[ "$3" == "10.0"* || "$3" == "10.1"* || "$3" == "10.2"* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1149,6 +1199,7 @@ _download_boot_files() {
             "$bin"/img4tool -e -o "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.dec
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 10.3.x 的处理方式
         elif [[ "$3" == "10.3"* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1176,6 +1227,7 @@ _download_boot_files() {
             "$bin"/img4tool -e -o "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.dec
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 11.x 的处理方式
         elif [[ "$3" == "11."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1215,6 +1267,7 @@ _download_boot_files() {
             "$bin"/img4tool -e -o "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.dec
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 12.x 的处理方式
         elif [[ "$3" == "12."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1247,6 +1300,7 @@ _download_boot_files() {
             "$bin"/img4tool -e -o "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.dec
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.patched -n
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 13.x 的处理方式
         elif [[ "$3" == "13."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
@@ -1291,6 +1345,7 @@ _download_boot_files() {
             "$bin"/img4tool -e -o "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.dec
             "$bin"/dtree_patcher "$dir"/$1/$cpid/$3/devicetree.out "$dir"/$1/$cpid/$3/DeviceTree.patched -n -d 0
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/DeviceTree.patched -o "$dir"/$1/$cpid/$3/devicetree.img4 -A -M IM4M -T rdtr
+        # iOS 14.x 的处理方式
         elif [[ "$3" == "14."* ]]; then
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBSS.patched -o "$dir"/$1/$cpid/$3/iBSS.img4 -M IM4M -A -T ibss
             "$bin"/img4 -i "$dir"/$1/$cpid/$3/iBEC.patched -o "$dir"/$1/$cpid/$3/iBEC.img4 -M IM4M -A -T ibec
