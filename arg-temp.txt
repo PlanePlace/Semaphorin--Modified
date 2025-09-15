@@ -21,3 +21,6 @@ fi
 
 传入参数如下
 _download_ramdisk_boot_files $deviceid $replace ramdisk版本
+
+_boot_ramdisk
+    1. pongo=1 原系统16.x 17.x

@@ -2205,7 +2205,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         else
             _download_ramdisk_boot_files $deviceid $replace 11.4
         fi
-        # 若不存在 apticket.der/sep-firmware.img4/keybags 执行下载流程 传入当前运行版本
+        # 若不存在 apticket.der/sep-firmware.img4/keybags 执行下载流程 传入当前运行版本(使用本版本ramdisk完成提取操作,越狱提取就不用了)
         if [[ ! -e "$dir"/$deviceid/0.0/apticket.der || ! -e "$dir"/$deviceid/0.0/sep-firmware.img4 || ! -e "$dir"/$deviceid/0.0/keybags ]]; then
             _download_ramdisk_boot_files $deviceid $replace $r
         fi
@@ -2318,6 +2318,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
             pongo=1
         fi
     fi
+    # 进入 SSH ramdisk
     _boot_ramdisk $deviceid $replace $r
     if [[ "$hit2" == 1 ]]; then
         hit2=0
@@ -2339,8 +2340,9 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
     sleep 6
     "$bin"/iproxy 2222 22 & sleep 1
     sleep 2
-    ##提取激活文件
+    # 提取激活文件
     if [[ "$restore" == 1 ]]; then
+        # iPhone X 设备在提取前的特别处理
         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
             "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/usr/sbin/nvram auto-boot=false" 2> /dev/null
         fi
@@ -2439,6 +2441,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 echo "[*] Backed up the required files required to downgrade"
             fi
         fi
+        # 检查文件是否提取完毕
         if [ ! -e "$dir"/$deviceid/0.0/apticket.der ]; then
             echo "missing ./apticket.der, which is required in order to proceed. exiting.."
             exit 0
