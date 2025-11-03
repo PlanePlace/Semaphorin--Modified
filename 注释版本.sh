@@ -1861,6 +1861,7 @@ _boot_ramdisk2() {
     "$bin"/irecovery -c bootx &
 }
 _boot_ramdisk() {
+    # pongo=1 且 当前运行版本 16.x 及以上 使用当前运行版本ramdisk
     if [[ "$pongo" == 1 ]]; then
         if [[ "$3" == "16."* || "$3" == "17."* ]]; then
             _download_ramdisk_boot_files $deviceid $replace $3
@@ -1885,6 +1886,7 @@ _boot_ramdisk() {
                     "$bin"/palera1n -r RestoreRamDisk.dmg -K checkra1n-kpf-pongo
                 fi
             fi
+        # 常规设备 pongo=0 调用_ramdisk2
         else
             _boot_ramdisk2
         fi
@@ -2293,7 +2295,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         else
             cd "$dir"/$deviceid/$cpid/ramdisk/11.4
         fi
-        # 若pango =1 且存在 apticket.der/sep-firmware.img4/keybags 则 hit2=1 pango=0
+        # 若pongo =1 且存在 apticket.der/sep-firmware.img4/keybags 则 hit2=1 pongo=0
         if [[ "$pongo" == 1 ]]; then
             if [[ -e "$dir"/$deviceid/0.0/apticket.der && -e "$dir"/$deviceid/0.0/sep-firmware.img4 && -e "$dir"/$deviceid/0.0/keybags ]]; then
                 hit2=1
@@ -2313,6 +2315,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         fi
     fi
     cd "$wd"
+    #不成立
     if [[ "$ramdisk" == 1 || "$dump_blobs" == 1 || "$dump_nand" == 1 || "$restore_activation" == 1 || "$restore_nand" == 1 || "$restore_mnt1" == 1 || "$restore_mnt2" == 1 || "$disable_NoMoreSIGABRT" == 1 || "$NoMoreSIGABRT" == 1 ]]; then
         if [[ "$version" == "16."* || "$version" == "17."* ]]; then
             pongo=1
@@ -2741,7 +2744,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 datafs=disk1s$datadisk
             fi
         else
-        # 7.x - 9.x 的新建分区
+        # 7.x - 10.2.x 的新建分区
             if [[ "$dualboot_hfs" == 1 ]]; then
                 if [[ ! -e "$dir"/$deviceid/0.0/mnt1.tar.gz ]]; then
                     "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/sbin/mount_apfs /dev/disk0s1s1 /mnt1"
@@ -3411,6 +3414,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
             "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "bash -c mount_filesystems" 2> /dev/null
             #"$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/usr/sbin/nvram oblit-inprogress=5"
         else
+        # 7.x - 10.2.x 处理
             if [[ "$dualboot_hfs" == 1 ]]; then
 
                 remote_cmd "/sbin/mount -w -t hfs /dev/disk0s1s4 /mnt4 2> /dev/null" && {

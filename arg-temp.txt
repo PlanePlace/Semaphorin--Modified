@@ -1,14 +1,3 @@
-pongo
-1. iPhone10,x iPad6,x iPad7,x =1
-if [[ "$deviceid" == "iPhone10"* || "$deviceid" == "iPad6"* || "$deviceid" == "iPad7"* ]]; then
-    pongo=1
-2.         if [[ "$pongo" == 1 ]]; then
-            if [[ -e "$dir"/$deviceid/0.0/apticket.der && -e "$dir"/$deviceid/0.0/sep-firmware.img4 && -e "$dir"/$deviceid/0.0/keybags ]]; then
-                hit2=1
-                pongo=0
-    
-
-
 iOS 9.3 - 10.3.x
 要求force_activation
 if [[ "$version" == "9.3"* || "$version" == "10."* ]]; then
@@ -24,3 +13,77 @@ _download_ramdisk_boot_files $deviceid $replace ramdisk版本
 
 _boot_ramdisk
     1. pongo=1 原系统16.x 17.x
+
+
+line 2470 开始刷写
+
+
+
+
+** pongo值的判定
+if [[ "$deviceid" == "iPhone10"* || "$deviceid" == "iPad6"* || "$deviceid" == "iPad7"* ]]; then
+    pongo=1
+    if [[ ! -e "$bin"/checkra1n-kpf-pongo ]]; then
+        cd "$bin"/
+        pwd
+        curl -k -SLO https://cdn.nickchan.lol/palera1n/artifacts/kpf/checkra1n-kpf-pongo
+        cd "$dir"/
+        pwd
+    fi
+fi
+如果设备为 iPhone X 或 iPad Pro 1st/2st 则 pongo值为1
+    此时下载checkra1n-kpf-pongo
+
+if [[ "$ramdisk" == 1 || "$dump_blobs" == 1 || "$dump_nand" == 1 || "$restore_activation" == 1 || "$restore_nand" == 1 || "$restore_mnt1" == 1 || "$restore_mnt2" == 1 || "$disable_NoMoreSIGABRT" == 1 || "$NoMoreSIGABRT" == 1 ]]; then
+如果执行了 以上arg 则2160后续pongo=0
+
+if [[ "$pongo" == 1 ]]; then
+    if [[ -e "$dir"/$deviceid/0.0/apticket.der && -e "$dir"/$deviceid/0.0/sep-firmware.img4 && -e "$dir"/$deviceid/0.0/keybags ]]; then
+        hit2=1
+        pongo=0
+    fi
+fi
+若pongo =1 且存在 apticket.der/sep-firmware.img4/keybags 则2300后 hit2=1 pongo=0
+
+    wd="$(pwd)"
+    if [[ -e "$dir"/$deviceid/0.0/apticket.der && -e "$dir"/$deviceid/0.0/sep-firmware.img4 && -e "$dir"/$deviceid/0.0/keybags ]]; then
+        if [[ "$cpid" == "0x8000" || "$cpid" == "0x8001" || "$cpid" == "0x8003" ]]; then
+            if [[ "$pongo" == 1 ]]; then
+                _download_ramdisk_boot_files $deviceid $replace 14.3
+                pongo=0
+                r="14.3"
+                fuck=1
+            fi
+        fi
+    fi
+如果存在apticket.der/sep-firmware.img4/keybags 且A9(X)设备 且pongo=1 则 下载14.3的ramdisk 2318后续 pongo=0  版本=14.3 fuck=1
+
+    if [[ "$hit2" == 1 ]]; then
+        hit2=0
+        pongo=1
+如果hit2=1 则2328后 hit2=0 pongo=1
+
+
+
+
+**hit值的判定
+       if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
+            "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/usr/sbin/nvram auto-boot=false" 2> /dev/null
+        fi
+        mkdir -p "$dir"/$deviceid/0.0/
+        hit=0
+iPhone X 设备在 2353 以后 hit=0
+
+
+            if [[ ! -e "$dir"/$deviceid/0.0/apticket.der || ! -e "$dir"/$deviceid/0.0/sep-firmware.img4 || ! -e "$dir"/$deviceid/0.0/keybags ]]; then
+                echo "[*] An error occured while trying to back up the required files required to downgrade"
+                $("$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/sbin/reboot &" 2> /dev/null &)
+                _kill_if_running iproxy
+                exit 0
+            else
+                hit=1
+                echo "[*] Backed up the required files required to downgrade"
+            fi
+在备份激活文件完成后 所有设备在 2445 以后 hit=1
+
+A9X设备 暂缓分析
