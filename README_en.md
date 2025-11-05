@@ -1,6 +1,8 @@
-## 该分支更改了FirmwareIVKey.jar，尝试解决CloudFlare防护问题导致的IVKey问题。
+## 该分支更改了FirmwareIVKey.jar，通过提取存放在我 GitHub 仓库的IVKey，尝试解决CloudFlare防护问题导致的IVKey问题。
+## 注意！您现在只能对 A7(X) - A8(X) 设备进行降级，且降级目标版本为 iOS 7.X - iOS 9.X！我将会稍后向 GitHub 仓库里添加更多的 IVKey 来解决这个问题。
 
 ## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting IVKey.
+## Pay attention！You can only downgrade the device quipped with A7(X) or A8(X)，also the target version should be the range between iOS 7.X and iOS 9.X. I'll add more IVKeys in my repo later to solve this problem.
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
