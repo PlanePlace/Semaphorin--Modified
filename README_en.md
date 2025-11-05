@@ -1,3 +1,7 @@
+## 该分支更改了FirmwareIVKey.jar，尝试解决CloudFlare防护问题导致的IVKey问题。
+
+## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting IVKey.
+
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
    <h1> Semaphorin 
@@ -12,8 +16,6 @@
 ## IF YOUR DEVICE SUPPORTS [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), YOU SHOULD REALLY USE THAT OVER THIS.
 
 ## This modified Semaphorin has changed the method of obtaining IVKey and the download version of ramdisk.
-
-## Due to so many bugs we encountered recently, I'm planning to write a .md to let u know how to mannuly downgrade ur devices. Please wait!😉
 
 ## Support
 
@@ -82,28 +84,6 @@ It should then begin the process of downgrading your device. Please follow the o
 If you downgraded to iOS 9 or later, please use the jailbreak app on your home screen to begin jailbreaking your device.
 
 For iOS 7 and 8, see below troubleshooting steps for jailbreaking.
-
-## IVKey
-
-The IVKey issue will not affect users who want to downgrade iOS 11 and above, as iOS 11 and newer versions do not require decrypting the Root Filesystem.
-
-For some strange reason, the IVKey obtained by FirmwareKeysDl-1.0-SNAPSHOT.jar is incorrect, causing OS.dmg to fail to generate properly, which results in a failed downgrade.
-
-Therefore, this version of Semaphorin has modified the method of obtaining the IVKey, changing it to require the user to manually input the IVKey.
-
-link: https://www.theiphonewiki.com/wiki/Firmware_Keys
-
-Here’s an example:
-
-If you want to downgrade the iOS 8.3 version of iPad Air 2 (iPad 5,3), you need to visit this website.
-
-Then scroll down to find Firmware Versions and click on 8.x.
-
-Continue scrolling down, find iPad Air 2, and click on iPad 5,3 under 8.3.
-
-The Key value in the Root Filesystem section is your IVKey.
-
-When Semaphorin.sh prompts you to enter the IVKey during the downgrade process, just paste it in. 😉
 
 ## Subsequent runs after downgrade is finished
 
