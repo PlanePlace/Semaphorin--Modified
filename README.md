@@ -1,4 +1,4 @@
-## 该分支更改了FirmwareIVKey.jar，尝试解决CloudFlare防护问题导致的IVKey问题。
+## 该分支更改了FirmwareIVKey.jar，通过提取存放在我 GitHub 仓库的IVKey，尝试解决CloudFlare防护问题导致的IVKey问题。
 
 ## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting IVKey.
 
