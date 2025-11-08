@@ -282,7 +282,8 @@ parse_cmdline() {
 }
 get_device_mode() {
     if [ "$os" = "Darwin" ]; then
-        apples="$(system_profiler SPUSBDataType 2> /dev/null | grep -B1 'Vendor ID: 0x05ac' | grep 'Product ID:' | cut -dx -f2 | cut -d' ' -f1 | tail -r)"
+        apples="$(system_profiler SPUSBHostDataType 2> /dev/null | grep -A1 'USB Vendor ID: 0x05ac' | grep 'USB Product ID:' | cut -dx -f2 | cut -d' ' -f1 | tail -r
+)"
     elif [ "$os" = "Linux" ]; then
         apples="$(lsusb | cut -d' ' -f6 | grep '05ac:' | cut -d: -f2)"
     fi
@@ -326,7 +327,7 @@ get_device_mode() {
     if [ "$os" = "Linux" ]; then
         usbserials=$(cat /sys/bus/usb/devices/*/serial)
     elif [ "$os" = "Darwin" ]; then
-        usbserials=$(system_profiler SPUSBDataType 2> /dev/null | grep 'Serial Number' | cut -d: -f2- | sed 's/ //')
+        usbserials=$(system_profiler SPUSBHostDataType 2> /dev/null | grep 'Serial Number' | cut -d: -f2- | sed 's/ //')
     fi
     if grep -qE '(ramdisk tool|SSHRD_Script) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [0-9]{1,2} [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}' <<< "$usbserials"; then
         device_mode=ramdisk
@@ -335,11 +336,11 @@ get_device_mode() {
 }
 _wait_for_dfu() {
     if [ "$os" = "Darwin" ]; then
-        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
             echo "[*] Waiting for device in DFU mode"
         fi
 
-        while ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); do
+        while ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); do
             sleep 1
         done
     else
@@ -1833,7 +1834,7 @@ if [[ "$*" == *"--fix-auto-boot"* ]]; then
     exit 0
 fi 
 if [ "$os" = "Darwin" ]; then
-    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
         "$bin"/dfuhelper.sh
     fi
 else
@@ -1945,7 +1946,7 @@ if [[ "$boot" == 1 ]]; then
         echo "[*] You can enable auto-boot again at any time by running $0 $version --fix-auto-boot"
         sleep 5
         if [ "$os" = "Darwin" ]; then
-            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+            if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
                     if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2008,7 +2009,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         _download_ramdisk_boot_files $deviceid $replace $rdversion
         sleep 1
         if [ "$os" = "Darwin" ]; then
-            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+            if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
                     if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2105,7 +2106,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         echo "[*] Waiting for device in DFU mode"
         sleep 1
         if [ "$os" = "Darwin" ]; then
-            if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+            if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                 if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                     sleep 10
                     if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2342,7 +2343,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 $("$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/sbin/reboot &" 2> /dev/null &)
                 _kill_if_running iproxy
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2629,7 +2630,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                     _kill_if_running iproxy
                     echo "[*] Device should now reboot. Get ready to enter DFU mode..."
                     if [ "$os" = "Darwin" ]; then
-                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2705,7 +2706,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                     _kill_if_running iproxy
                     echo "[*] Device should now reboot. Get ready to enter DFU mode..."
                     if [ "$os" = "Darwin" ]; then
-                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2773,7 +2774,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 _kill_if_running iproxy
                 echo "[*] Device should boot to Recovery mode. Please wait..."
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -2839,7 +2840,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
             _kill_if_running iproxy
             echo "[*] Device should now reboot. Get ready to enter DFU mode..."
             if [ "$os" = "Darwin" ]; then
-                if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                     if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                         sleep 10
                         if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3365,7 +3366,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                     _kill_if_running iproxy
                     echo "[*] Device should boot to Recovery mode. Please wait..."
                     if [ "$os" = "Darwin" ]; then
-                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3733,7 +3734,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 sleep 5
                 _kill_if_running iproxy
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3781,7 +3782,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 echo "[*] We will then boot into a ramdisk to fixup iOS $r to allow it to be booted again as normal"
                 sleep 5
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3849,7 +3850,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 sleep 5
                 _kill_if_running iproxy
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3899,7 +3900,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                     echo "[*] We will then boot into a ramdisk to run fsck before booting iOS $version"
                     sleep 5
                     if [ "$os" = "Darwin" ]; then
-                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
@@ -3981,7 +3982,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
             if [[ "$version" == "9.3"* || "$version" == "10."* || "$version" == "11."* || "$version" == "12."* ||  "$version" == "13."* || "$version" == "14."* ]]; then
                 if [ -e "$dir"/$deviceid/$cpid/$version/iBSS.img4 ]; then
                     if [ "$os" = "Darwin" ]; then
-                        if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                        if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                             if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                                 sleep 10
                                 if [ "$(get_device_mode)" = "recovery" ]; then
@@ -4031,7 +4032,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 echo "[*] We will then activate your device to allow you to navigate to the home screen"
                 sleep 5
                 if [ "$os" = "Darwin" ]; then
-                    if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                    if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                         if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                             sleep 10
                             if [ "$(get_device_mode)" = "recovery" ]; then
@@ -4145,7 +4146,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
         _kill_if_running iproxy
         if [ -e "$dir"/$deviceid/$cpid/$version/iBSS.img4 ]; then
             if [ "$os" = "Darwin" ]; then
-                if ! (system_profiler SPUSBDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
+                if ! (system_profiler SPUSBHostDataType 2> /dev/null | grep ' Apple Mobile Device (DFU Mode)' >> /dev/null); then
                     if [[ "$deviceid" == "iPhone10"* || "$cpid" == "0x8015"* ]]; then
                         sleep 10
                         if [ "$(get_device_mode)" = "recovery" ]; then
