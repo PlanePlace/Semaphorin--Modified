@@ -1,8 +1,12 @@
 ## 该分支更改了FirmwareIVKey.jar，通过提取存放在我 GitHub 仓库的IVKey，尝试解决CloudFlare防护问题导致的IVKey问题。
-## 注意！您现在只能对 A7(X) - A8(X) 设备进行降级，且降级目标版本为 iOS 7.X - iOS 9.X！我将会稍后向 GitHub 仓库里添加更多的 IVKey 来解决这个问题。
+注意！您现在只能对 A7(X) - A8(X) 设备进行降级，且降级目标版本为 iOS 7.X - iOS 9.X！我将会稍后向 GitHub 仓库里添加更多的 IVKey 来解决这个问题。
+## 该版本的 Semaphorin 适用于 macOS 15 及以下，我已创建一个新版本来适配 macOS 26，请前往 “macOS Tahoe”分支。
+我已经测试了该版本的 Semaphorin，正常运行在搭载macOS 26.1的MacBook Pro M3 Pro，成功将iPad Air 2 从 15.8.5 降级至 8.1
 
 ## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting it.
-## Pay attention! You can only downgrade the device quipped with A7(X) or A8(X), also the target version should be the range between iOS 7.X and iOS 9.X. I'll add more IVKeys in my repository later to solve this problem.
+Pay attention! You can only downgrade the device quipped with A7(X) or A8(X), also the target version should be the range between iOS 7.X and iOS 9.X. I'll add more IVKeys in my repository later to solve this problem.
+## This version of Semaphorin is for macOS 15 or below. I've created a new branch for macOS 26. Please go to "macOS Tahoe" branch.
+I've tested it on MacBook Pro M3 Pro with macOS 26.1, downgrading iPad Air 2 from 15.8.5 to 8.1.
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">

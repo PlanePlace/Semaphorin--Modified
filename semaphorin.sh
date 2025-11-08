@@ -1794,10 +1794,11 @@ if [ ! -e java/bin/java ]; then
     mkdir java
     cd java
     if [ "$os" = "Darwin" ]; then
-        curl -k -SLO https://builds.openlogic.com/downloadJDK/openlogic-openjdk-jre/8u262-b10/openlogic-openjdk-jre-8u262-b10-mac-x64.zip
-        "$bin"/7z x openlogic-openjdk-jre-8u262-b10-mac-x64.zip
-        sudo cp -rf openlogic-openjdk-jre-8u262-b10-mac-x64/jdk1.8.0_262.jre/Contents/Home/* .
-        sudo rm -rf openlogic-openjdk-jre-8u262-b10-mac-x64/
+        curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_macos-x64_bin.tar.gz
+        "$bin"/7z x jdk-25_macos-x64_bin.tar.gz
+        "$bin"/7z x jdk-25_macos-x64_bin.tar
+        sudo cp -rf jdk-25.0.1.jdk/Contents/Home/* .
+        sudo rm -rf jdk-25.0.1.jdk/
     else
         curl -k -SLO https://builds.openlogic.com/downloadJDK/openlogic-openjdk-jre/8u262-b10/openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
         "$bin"/gnutar -xzf openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
