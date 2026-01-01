@@ -17,7 +17,7 @@
 
 ## IF YOUR DEVICE SUPPORTS [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), YOU SHOULD REALLY USE THAT OVER THIS.
 
-## This modified Semaphorin has changed the method of obtaining IVKey and the download version of ramdisk.
+## This modified Semaphorin has changed the method of obtaining IVKey.
 
 ## Support
 
@@ -169,3 +169,4 @@ We back up the `activation_records` from your main OS prior to downgrading your 
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
