@@ -1,6 +1,6 @@
 ### English Version of README.md
 
-[https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md](https://github.com/PlanePlace/Semaphorin--Modified/blob/尝试替换FirmwareIVKey/README_en.md)
+[Click here](https://github.com/PlanePlace/Semaphorin-Modified/blob/尝试替换FirmwareIVKey/README_en.md)
 
 ### 分支说明
 本分支对 **FirmwareIVKey.jar** 进行了修改：  
@@ -97,7 +97,7 @@ Semaphorin 将会删除您手机上的所有数据，包括设备原有的 iOS �
 
 1. 在 macOS 上，打开终端，输入 `xcode-select install` 来安装 `git` 。
 
-2. 输入 `git clone https://github.com/PlanePlace/Semaphorin--Modified && cd Semaphorin--Modified` 来获取 Semaphorin。
+2. 输入 `git clone https://github.com/PlanePlace/Semaphorin-Modified && cd Semaphorin-Modified` 来获取 Semaphorin。
 
 3. 连接处于 DFU 模式的设备。
 
@@ -192,4 +192,5 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
