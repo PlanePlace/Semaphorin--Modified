@@ -1,8 +1,21 @@
-## 该分支更改了FirmwareIVKey.jar，通过提取存放在我 GitHub 仓库的IVKey，尝试解决CloudFlare防护问题导致的IVKey问题。
-## 注意！您现在只能对 A7(X) - A8(X) 设备进行降级，且降级目标版本为 iOS 7.X - iOS 9.X！我将会稍后向 GitHub 仓库里添加更多的 IVKey 来解决这个问题。
+### Branch Overview
+This branch modifies **FirmwareIVKey.jar** by changing the IVKey retrieval mechanism.  
+Instead of fetching IVKeys dynamically, it reads pre-stored IVKeys from my GitHub repository to bypass issues caused by **Cloudflare protection**.
 
-## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting it.
-## Pay attention! You can only downgrade the device quipped with A7(X) or A8(X), also the target version should be the range between iOS 7.X and iOS 9.X. I'll add more IVKeys in my repository later to solve this problem.
+### Device & iOS Version Limitations
+- **Supported devices**: A7 / A7X / A8 / A8X  
+- **Supported target versions**: iOS 7.x – iOS 9.x  
+
+### macOS Compatibility
+- This version of **Semaphorin is intended for macOS 15 or below** (Not tested on Linux).  
+- A separate branch has been created to support **macOS 26 (Tahoe)**  
+  → Please switch to the **`macOS Tahoe`** branch if you are using macOS 26
+
+### Testing Status
+Successfully tested in the following environment:  
+- MacBook Pro (M3 Pro)  
+- macOS 26.1  
+- Downgraded *iPad Air 2* from **iOS 15.8.5** to **iOS 8.1**  
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
@@ -16,20 +29,6 @@
 <h6 align="center"> This is a fork of the tool with some updates </h6>
 
 ## IF YOUR DEVICE SUPPORTS [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), YOU SHOULD REALLY USE THAT OVER THIS.
-
-## This modified Semaphorin has changed the method of obtaining IVKey.
-
-## Support
-
-If you encounter any problems, please report them on Issues.
-
-I’m still just a high school student with little ability, but I’ll do everything I can! 😭
-
-The Semaphorin project has been abandoned, but everyone still wants to use it because it’s the only tool that can bypass SEP forced downgrades, so I’m doing my part to fix it.
-
-I hope the 64-bit downgrade path will have more possibilities in the future. Please go easy on me, experts!
-
-It may be better for someone to rewrite the entire thing, and/or just create or use another tool
 
 ## Chart of compatibility
 

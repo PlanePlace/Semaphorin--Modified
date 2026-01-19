@@ -1,12 +1,26 @@
-## 该分支更改了FirmwareIVKey.jar，通过提取存放在我 GitHub 仓库的IVKey，尝试解决CloudFlare防护问题导致的IVKey问题。
-注意！您现在只能对 A7(X) - A8(X) 设备进行降级，且降级目标版本为 iOS 7.X - iOS 9.X！我将会稍后向 GitHub 仓库里添加更多的 IVKey 来解决这个问题。
-## 该版本的 Semaphorin 适用于 macOS 15 及以下，我已创建一个新版本来适配 macOS 26，请前往 “macOS Tahoe”分支。
-我已经测试了该版本的 Semaphorin，正常运行在搭载macOS 26.1的MacBook Pro M3 Pro，成功将iPad Air 2 从 15.8.5 降级至 8.1
+### English Version of README.md
 
-## This branch is trying to fix the IVKey issue, which casued by CloudFlare, by changing the method of getting it.
-Pay attention! You can only downgrade the device quipped with A7(X) or A8(X), also the target version should be the range between iOS 7.X and iOS 9.X. I'll add more IVKeys in my repository later to solve this problem.
-## This version of Semaphorin is for macOS 15 or below. I've created a new branch for macOS 26. Please go to "macOS Tahoe" branch.
-I've tested it on MacBook Pro M3 Pro with macOS 26.1, downgrading iPad Air 2 from 15.8.5 to 8.1.
+[https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md](https://github.com/PlanePlace/Semaphorin--Modified/blob/尝试替换FirmwareIVKey/README_en.md)
+
+### 分支说明
+本分支对 **FirmwareIVKey.jar** 进行了修改：  
+通过从本人 GitHub 仓库中提取并读取已存储的 **IVKey**，以规避 **Cloudflare 防护机制**导致的 IVKey 获取失败问题。
+
+### 设备与系统限制（重要）
+- **支持设备**：A7 / A7X / A8 / A8X  
+- **支持目标系统版本**：iOS 7.x – iOS 9.x  
+- 暂无增添计划。
+
+### macOS 兼容性说明
+- 本分支的 **Semaphorin 仅适用于 macOS 15 及以下版本** (未于Linux平台测试。)
+- 针对 **macOS 26（Tahoe）**，已创建单独适配分支  
+  → 请前往 **`macOS Tahoe`** 分支使用
+
+### 测试情况
+已在以下环境完成实测：
+- MacBook Pro（M3 Pro）
+- macOS 26.1
+- 将 *iPad Air 2* 从 **iOS 15.8.5** 降级至 **iOS 8.1**
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
@@ -21,25 +35,9 @@ I've tested it on MacBook Pro M3 Pro with macOS 26.1, downgrading iPad Air 2 fro
 
 ## 如果你的设备支持 [LEGACY-IOS-KIT](https://github.com/LukeZGD/Legacy-iOS-Kit), 那么你应该使用Legacy-iOS-Kit.
 
-## English Version of README.md
-
-[https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md](https://github.com/PlanePlace/Semaphorin--Modified/blob/尝试替换FirmwareIVKey/README_en.md)
-
-## 工具修改了 IVKey 的获取方式。
-
 ## 脚本来源
 
 https://github.com/LukeZGD/Semaphorin 
-
-## 支持部分
-
-有问题可以提在 Issues 里面！！！
-
-我还是个高中生，没有什么能力，但是如果我能做的事情我一定会做的！😭
-
-Semaphorin这个项目已经废弃掉了，但是大家还是很想用它，因为能无视 SEP 强制降级的工具只有这一个，所以我尽我一份努力来修复一下
-
-各位大佬轻喷，希望 64bit 的降级道路未来能出现更多可能！
 
 ## 兼容性图表
 
