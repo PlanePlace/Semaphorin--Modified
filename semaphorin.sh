@@ -1800,10 +1800,10 @@ if [ ! -e java/bin/java ]; then
         sudo cp -rf jdk-25.0.1.jdk/Contents/Home/* .
         sudo rm -rf jdk-25.0.1.jdk/
     else
-        curl -k -SLO https://builds.openlogic.com/downloadJDK/openlogic-openjdk-jre/8u262-b10/openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
-        "$bin"/gnutar -xzf openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
-        cp -rf openlogic-openjdk-jre-8u262-b10-linux-64/* .
-        rm -rf openlogic-openjdk-jre-8u262-b10-linux*
+        curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz
+        "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar.gz
+        cp -rf jdk-25/* .
+        rm -rf jdk-25*
     fi
     cd ..
 fi
