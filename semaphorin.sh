@@ -1802,8 +1802,9 @@ if [ ! -e java/bin/java ]; then
     else
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz
         "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar.gz
-        cp -rf jdk-25/* .
-        rm -rf jdk-25*
+        "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar
+        cp -rf jdk-25.0.1/* .
+        rm -rf jdk-25.0.1*
     fi
     cd ..
 fi
