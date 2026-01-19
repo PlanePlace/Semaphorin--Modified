@@ -68,7 +68,7 @@ To use this app, you need to downgrade to a supported version, and have a suppor
 
 `xcode-select install` to install `git` on macos
 
-`git clone https://github.com/PlanePlace/Semaphorin--Modified && cd Semaphorin--Modified`
+`git clone https://github.com/PlanePlace/Semaphorin-Modified && cd Semaphorin-Modified`
 
 Connect device in DFU mode
 
@@ -168,4 +168,5 @@ We back up the `activation_records` from your main OS prior to downgrading your 
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
