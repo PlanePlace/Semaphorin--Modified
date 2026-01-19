@@ -23,7 +23,7 @@ I've tested it on MacBook Pro M3 Pro with macOS 26.1, downgrading iPad Air 2 fro
 
 ## English Version of README.md
 
-https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md
+[https://github.com/PlanePlace/Semaphorin--Modified/blob/main/README_en.md](https://github.com/PlanePlace/Semaphorin--Modified/blob/尝试替换FirmwareIVKey/README_en.md)
 
 ## 工具修改了 IVKey 的获取方式。
 
@@ -194,3 +194,4 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
