@@ -6,7 +6,7 @@
 本分支对 **FirmwareIVKey.jar** 进行了修改：  
 通过从本人 GitHub 仓库中提取并读取已存储的 **IVKey**，以规避 **Cloudflare 防护机制**导致的 IVKey 获取失败问题。
 
-### 设备与系统限制（重要）
+### 设备与系统限制
 - **支持设备**：A7 / A7X / A8 / A8X  
 - **支持目标系统版本**：iOS 7.x – iOS 9.x  
 - 暂无增添计划。
@@ -192,6 +192,7 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
 
