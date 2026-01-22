@@ -12,7 +12,7 @@
 - 暂无增添计划。
 
 ### macOS 兼容性说明
-- 本分支的 **Semaphorin 仅适用于 macOS 15 及以下版本** (未于Linux平台测试。)
+- 本分支的 **Semaphorin 仅适用于 macOS 15 及以下版本** (同时适用于Linux平台。)
 - 针对 **macOS 26（Tahoe）**，已创建单独适配分支  
   → 请前往 **`macOS Tahoe`** 分支使用
 
@@ -21,6 +21,10 @@
 - MacBook Pro（M3 Pro）
 - macOS 26.1
 - 将 *iPad Air 2* 从 **iOS 15.8.5** 降级至 **iOS 8.1**
+
+- Lenovo XiaoXinPro 13 2019
+- Linux Mint 22.3
+- 将 *iPad Air 2* 从 **iOS 15.8.5** 降级至 **iOS 9.0**
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
@@ -192,6 +196,7 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
 
