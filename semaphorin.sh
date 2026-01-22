@@ -536,7 +536,6 @@ _download_ramdisk_boot_files() {
                 fi
                 hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 sudo diskutil enableOwnership /tmp/ramdisk
-                gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -579,7 +578,6 @@ _download_ramdisk_boot_files() {
                     hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 fi
                 sudo diskutil enableOwnership /tmp/ramdisk
-                gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -642,7 +640,6 @@ _download_ramdisk_boot_files() {
                 else
                     "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg grow 60000000
                 fi
-                gzip -d "$sshtars"/ssh.tar.gz
                 "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg untar "$sshtars"/ssh.tar
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -679,7 +676,6 @@ _download_ramdisk_boot_files() {
                 else
                     "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg grow 120000000
                 fi
-                gzip -d "$sshtars"/ssh.tar.gz
                 "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg untar "$sshtars"/ssh.tar
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -1797,14 +1793,13 @@ if [ ! -e java/bin/java ]; then
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar
-        sudo cp -rf jdk-25.0.1.jdk/Contents/Home/* .
-        sudo rm -rf jdk-25.0.1.jdk/
+        sudo cp -rf jdk-25.0.2.jdk/Contents/Home/* .
+        sudo rm -rf jdk-25.0.2.jdk/
     else
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz
         "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar.gz
-        "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar
-        cp -rf jdk-25.0.1/* .
-        rm -rf jdk-25.0.1*
+        cp -rf jdk-25.0.2/* .
+        rm -rf jdk-25.0.2*
     fi
     cd ..
 fi
