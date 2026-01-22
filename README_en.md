@@ -1,3 +1,7 @@
+### Demo Video
+
+[Click here (on Bilibili)](https://www.bilibili.com/video/BV1P3BfBeET4/?vd_source=3225999eb5f030d81e24d18f048bc317)
+
 ### Branch Overview
 This branch modifies **FirmwareIVKey.jar** by changing the IVKey retrieval mechanism.  
 Instead of fetching IVKeys dynamically, it reads pre-stored IVKeys from my GitHub repository to bypass issues caused by **Cloudflare protection**.
@@ -7,7 +11,7 @@ Instead of fetching IVKeys dynamically, it reads pre-stored IVKeys from my GitHu
 - **Supported target versions**: iOS 7.x – iOS 9.x  
 
 ### macOS Compatibility
-- This version of **Semaphorin is intended for macOS 15 or below** (Not tested on Linux).  
+- This version of **Semaphorin is intended for macOS 15 or below** (Also tested on Linux).  
 - A separate branch has been created to support **macOS 26 (Tahoe)**  
   → Please switch to the **`macOS Tahoe`** branch if you are using macOS 26
 
@@ -15,7 +19,11 @@ Instead of fetching IVKeys dynamically, it reads pre-stored IVKeys from my GitHu
 Successfully tested in the following environment:  
 - MacBook Pro (M3 Pro)  
 - macOS 26.1  
-- Downgraded *iPad Air 2* from **iOS 15.8.5** to **iOS 8.1**  
+- Downgraded *iPad Air 2* from **iOS 15.8.5** to **iOS 8.1**
+
+- Lenovo XiaoXinPro 13 2019 - i5 10210U
+- Linux Mint 22.3
+- Downgraded *iPad Air 2* from **iOS 15.8.5** to **iOS 9.0**
 
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
@@ -168,5 +176,6 @@ We back up the `activation_records` from your main OS prior to downgrading your 
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
