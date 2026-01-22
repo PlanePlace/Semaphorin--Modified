@@ -2,6 +2,10 @@
 
 [Click here](https://github.com/PlanePlace/Semaphorin-Modified/blob/Modified/README_en.md)
 
+### Demo 演示
+
+[Click here](https://www.bilibili.com/video/BV1P3BfBeET4/?vd_source=3225999eb5f030d81e24d18f048bc317)
+
 ### 分支说明
 本分支对 **FirmwareIVKey.jar** 进行了修改：  
 通过从本人 GitHub 仓库中提取并读取已存储的 **IVKey**，以规避 **Cloudflare 防护机制**导致的 IVKey 获取失败问题。
@@ -12,7 +16,7 @@
 - 暂无增添计划。
 
 ### macOS 兼容性说明
-- 本分支的 **Semaphorin 仅适用于 macOS 15 及以下版本** (同时适用于Linux平台。)
+- 本分支的 **Semaphorin 仅适用于 macOS 15 及以下版本** (同时适用于Linux平台。)  
 - 针对 **macOS 26（Tahoe）**，已创建单独适配分支  
   → 请前往 **`macOS Tahoe`** 分支使用
 
@@ -20,7 +24,7 @@
 已在以下环境完成实测：
 - MacBook Pro（M3 Pro）
 - macOS 26.1
-- 将 *iPad Air 2* 从 **iOS 15.8.5** 降级至 **iOS 8.1**
+- 将 *iPad Air 2* 从 **iOS 15.8.5** 降级至 **iOS 8.1**  
 
 - Lenovo XiaoXinPro 13 2019
 - Linux Mint 22.3
@@ -196,6 +200,7 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
 
