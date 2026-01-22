@@ -537,7 +537,6 @@ _download_ramdisk_boot_files() {
                 fi
                 hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 sudo diskutil enableOwnership /tmp/ramdisk
-                gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -580,7 +579,6 @@ _download_ramdisk_boot_files() {
                     hdiutil attach -mountpoint /tmp/ramdisk "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg
                 fi
                 sudo diskutil enableOwnership /tmp/ramdisk
-                gzip -d "$sshtars"/ssh.tar.gz
                 sudo "$bin"/gnutar -xvf "$sshtars"/ssh.tar -C /tmp/ramdisk
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -643,7 +641,6 @@ _download_ramdisk_boot_files() {
                 else
                     "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg grow 60000000
                 fi
-                gzip -d "$sshtars"/ssh.tar.gz
                 "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg untar "$sshtars"/ssh.tar
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -680,7 +677,6 @@ _download_ramdisk_boot_files() {
                 else
                     "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg grow 120000000
                 fi
-                gzip -d "$sshtars"/ssh.tar.gz
                 "$bin"/hfsplus "$dir"/$1/$cpid/ramdisk/$3/RestoreRamDisk.dmg untar "$sshtars"/ssh.tar
                 if [[ "$3" == "7."* || "$3" == "8."* || "$3" == "9."* || "$3" == "10."* || "$3" == "11."* ]]; then
                     # fix scp
@@ -1798,13 +1794,13 @@ if [ ! -e java/bin/java ]; then
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar
-        sudo cp -rf jdk-25.0.1.jdk/Contents/Home/* .
-        sudo rm -rf jdk-25.0.1.jdk/
+        sudo cp -rf jdk-25.0.2.jdk/Contents/Home/* .
+        sudo rm -rf jdk-25.0.2.jdk/
     else
-        curl -k -SLO https://builds.openlogic.com/downloadJDK/openlogic-openjdk-jre/8u262-b10/openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
-        "$bin"/gnutar -xzf openlogic-openjdk-jre-8u262-b10-linux-x64.tar.gz
-        cp -rf openlogic-openjdk-jre-8u262-b10-linux-64/* .
-        rm -rf openlogic-openjdk-jre-8u262-b10-linux*
+        curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz
+        "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar.gz
+        cp -rf jdk-25.0.2/* .
+        rm -rf jdk-25.0.2*
     fi
     cd ..
 fi
@@ -3102,8 +3098,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/jb/com.apple.Accessibility.plist root@localhost:/mnt5/mobile/Library/Preferences/com.apple.Accessibility.plist
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt4/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw 2> /dev/null
                 "$bin"/dsc64patcher "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched -103
-                "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched root@localhost:/mnt4/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 2> /dev/null
-                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
+                "$bin"/pv "$dir/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched" | "$bin"/sshpass -p "alpine" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p 2222 root@localhost 'cat > /mnt4/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64'                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
                 #"$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost 'cp /mnt4/usr/libexec/keybagd /mnt4/usr/libexec/keybagd.bak' 2> /dev/null
                 #"$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/jb/fixkeybag root@localhost:/mnt4/usr/libexec/keybagd 2> /dev/null
             elif [[ "$version" == "11."* ]]; then
@@ -3354,8 +3349,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 #rm "$dir"/$deviceid/$cpid/$version/OS.tar
             else
                 echo "[*] Uploading $dir/$deviceid/$cpid/$version/rw.dmg, this may take up to 10 minutes or more..."
-                "$bin"/sshpass -p 'alpine' scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/rw.dmg root@localhost:/mnt2
-                #rm "$dir"/$deviceid/$cpid/$version/rw.dmg
+                "$bin"/pv "$dir"/$deviceid/$cpid/$version/rw.dmg | "$bin"/sshpass -p "alpine" ssh -o ServerAliveInterval=30 -p2222 root@localhost 'cat > /mnt2/rw.dmg'                #rm "$dir"/$deviceid/$cpid/$version/rw.dmg
                 disktomount="$("$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost '/usr/sbin/hdik /mnt2/rw.dmg' | tail -n 1 | cut -d ' ' -f 1)"
                 "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/sbin/mount_hfs -o ro $disktomount /mnt3"
                 echo "[*] Restoring root filesystem, this will take a long while..."
@@ -3630,8 +3624,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost 'rm -rf /mnt1/System/Library/DataClassMigrators/RestorePostProcess.migrator/' 2> /dev/null
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw 2> /dev/null
                 "$bin"/dsc64patcher "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched -8
-                "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 2> /dev/null
-                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
+                "$bin"/pv "$dir/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched" | "$bin"/sshpass -p "alpine" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p 2222 root@localhost 'cat > /mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64'                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
                 "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/usr/bin/chflags schg /mnt2/root/Library/Lockdown/data_ark.plist"
                 "$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost "/usr/bin/chflags schg /mnt2/mobile/Library/mad/data_ark.plist"
                 #"$bin"/sshpass -p 'alpine' ssh -o StrictHostKeyChecking=no -p2222 root@localhost 'cp /mnt1/usr/libexec/keybagd /mnt1/usr/libexec/keybagd.bak' 2> /dev/null
@@ -3663,8 +3656,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/lockdownd.patched root@localhost:/mnt1/usr/libexec/lockdownd 2> /dev/null
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw 2> /dev/null
                 "$bin"/dsc64patcher "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched -7
-                "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 2> /dev/null
-                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
+                "$bin"/pv "$dir/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched" | "$bin"/sshpass -p "alpine" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p 2222 root@localhost 'cat > /mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64'                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
             elif [[ "$version" == "9."* ]]; then
                 if [[ "$appleinternal" == 1 ]]; then
                     "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/jb/AppleInternal.tar root@localhost:/mnt1/ 2> /dev/null
@@ -3701,8 +3693,7 @@ if [[ "$ramdisk" == 1 || "$restore" == 1 || "$dump_blobs" == 1 || "$force_activa
                 fi
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw 2> /dev/null
                 "$bin"/dsc64patcher "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.raw "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched -9
-                "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched root@localhost:/mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 2> /dev/null
-                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
+               "$bin"/pv "$dir/$deviceid/$cpid/$version/dyld_shared_cache_arm64.patched" | "$bin"/sshpass -p "alpine" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -p 2222 root@localhost 'cat > /mnt1/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64'                rm "$dir"/$deviceid/$cpid/$version/dyld_shared_cache_arm64*
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt1/usr/libexec/lockdownd "$dir"/$deviceid/$cpid/$version/lockdownd.raw 2> /dev/null
                 "$bin"/sshpass -p "alpine" scp -o StrictHostKeyChecking=no -P 2222 root@localhost:/mnt1/System/Library/PrivateFrameworks/MobileActivation.framework/Support/mobactivationd "$dir"/$deviceid/$cpid/$version/mobactivationd.raw 2> /dev/null
             fi
