@@ -1794,8 +1794,8 @@ if [ ! -e java/bin/java ]; then
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar.gz
         "$bin"/7z x jdk-25_macos-x64_bin.tar
-        sudo cp -rf jdk-25.0.2.jdk/Contents/Home/* .
-        sudo rm -rf jdk-25.0.2.jdk/
+        cp -rf jdk-25.0.2.jdk/Contents/Home/* .
+        rm -rf jdk-25.0.2.jdk/
     else
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz
         "$bin"/gnutar -xzf jdk-25_linux-x64_bin.tar.gz
