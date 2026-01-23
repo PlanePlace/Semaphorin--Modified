@@ -5,7 +5,7 @@
 ### Demo 演示
 
 [Linux Mint 22.3](https://www.bilibili.com/video/BV1P3BfBeET4/?vd_source=3225999eb5f030d81e24d18f048bc317)  
-[macOS 26.3](https://www.bilibili.com/video/BV1xkzKBxEFb/?vd_source=3225999eb5f030d81e24d18f048bc317)
+[macOS 26.3](https://www.bilibili.com/video/BV1xkzKBxEFb/?vd_source=3225999eb5f030d81e24d18f048bc317)  
 [Windows 引导 A8(X) 设备](https://www.bilibili.com/video/BV1Y4zKBiE1P/?vd_source=3225999eb5f030d81e24d18f048bc317)
 
 ### 分支说明
@@ -208,6 +208,7 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
 
