@@ -1,7 +1,8 @@
 ### Demo Video
 
-[Linux Mint 22.3 (on bilibili)](https://www.bilibili.com/video/BV1P3BfBeET4/?vd_source=3225999eb5f030d81e24d18f048bc317)  
-[macOS 26.3 (on bilibili)](https://www.bilibili.com/video/BV1xkzKBxEFb/?vd_source=3225999eb5f030d81e24d18f048bc317)
+[Linux Mint 22.3 (on bilibili)](https://www.bilibili.com/video/BV1P3BfBeET4)  
+[macOS 26.3 (on bilibili)](https://www.bilibili.com/video/BV1xkzKBxEFb)  
+[Windows boot A8(X) devices](https://www.bilibili.com/video/BV1Y4zKBiE1P)
 
 ### Branch Overview
 This branch modifies **FirmwareIVKey.jar** by changing the IVKey retrieval mechanism.  
@@ -177,6 +178,7 @@ We back up the `activation_records` from your main OS prior to downgrading your 
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
 
 
 
