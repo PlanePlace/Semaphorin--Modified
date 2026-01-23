@@ -1792,8 +1792,7 @@ if [ ! -e java/bin/java ]; then
     cd java
     if [ "$os" = "Darwin" ]; then
         curl -k -SLO https://download.oracle.com/java/25/latest/jdk-25_macos-x64_bin.tar.gz
-        "$bin"/7z x jdk-25_macos-x64_bin.tar.gz
-        "$bin"/7z x jdk-25_macos-x64_bin.tar
+        tar --no-same-owner -xzf jdk-25_macos-x64_bin.tar.gz
         cp -rf jdk-25.0.2.jdk/Contents/Home/* .
         rm -rf jdk-25.0.2.jdk/
     else
