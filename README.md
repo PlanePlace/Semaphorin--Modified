@@ -96,6 +96,12 @@ USB-C 转 Lightning 的数据线将 **不会** 正常工作。
     `ln -s /usr/local/opt/openssl@3/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.3.dylib`
     
     `ln -s /usr/local/opt/openssl@3/lib/libssl.3.dylib /usr/local/lib/libssl.3.dylib`
+
+5. 安装 pyimg4: `python3 -m pip install --user pyimg4`
+
+6. 设置 环境变量 
+
+    `export PATH="$HOME/Library/Python/3.14/bin:$PATH"`
     
 ## 我该如何使用它？
 
