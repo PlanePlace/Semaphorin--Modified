@@ -1,3 +1,7 @@
+## 不要使用这个分支！  
+
+请前往 "Modified" 或 "macOS-Tahoe" 分支，以获得更好的体验。  
+
 <div align="center">
 <img src="https://files.catbox.moe/x7b0e2.png" height="128" width="128" style="border-radius:25%">
    <h1> Semaphorin 
@@ -209,3 +213,4 @@ Semaphorin 不会绕过任何**种类**的激活锁
 - [exploit3dguy](https://github.com/exploit3dguy/) for [iPatcher](https://github.com/exploit3dguy/iPatcher) which is used for patching iBoot on ios 7
 - [dora2-ios](https://github.com/dora2-iOS) for [iPwnder](https://iarchive.app/Download/ipwnder_macosx)
 - [NyanSatan](https://github.com/NyanSatan) for [fixkeybag](https://github.com/NyanSatan/fixkeybag)
+
